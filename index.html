@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 	<meta charset="utf-8">
 	<title>JesmBounce</title>
 	<link rel="stylesheet" href="css/style.css">
+    <!--[IF LT IE 9]>
+        <script src='js/html5shiv.min.js'></script>
+    <![ENDIF]-->
 </head>
 
 <body>
-    <div id="main">
+    <main>
 		<div id="info_jogo">
 			<!--Vidas: - &bull; -->Pontos: <span id="placar">0</span> &bull; Recorde: <span id="recorde">0</span>
 		</div>
-    </div>
+    </main>
     <div id="alert">
 		<div>
 			<p></p>
@@ -25,7 +28,10 @@
 		</div>
     </div>
 
-	<script src="js/jesm3.js"></script>
-	<script src="js/script.js"></script>
+	<script src="js/Jesm4.min.js"></script>
+	<script src="js/App.js"></script>
+	<script>
+		App.init(Jesm.pega('main', 0));
+	</script>
 </body>
 </html>
