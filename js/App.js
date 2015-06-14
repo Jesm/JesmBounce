@@ -52,64 +52,57 @@ var App={
 			};
 		},
 
-		alert:function(str){
-			var diag=App.html.dialogs.alert, valorHeightFuturo;
-			Jesm.css(diag.elemento, "display:block;width:500px;height:auto;opacity:.1").pega("p", 0).innerHTML=str;
+		_displayDialog:function(str, isConfirm){
+			var dialog=App.html.dialog;
+			Jesm.css(dialog.elemento, 'opacity:0;display:block');
+			dialog.elemento.classList[isConfirm?'add':'remove']('show_cancel');
+			App.html.dialogText.innerHTML=str;
+			Jesm.css(App.html.dialogContainer.elemento, 'opacity:0;left:30px');
+			dialog.go(.25, [1]);
+			App.html.dialogContainer.go(.4, [1, 0]);
 			
-			var sizeMain=Jesm.Cross.client(App.html.root), size=Jesm.Cross.client(diag.elemento);
-			Jesm.cada(sizeMain, function(val, ind){
-				Jesm.css(diag.elemento, (ind?"top":"left")+":"+(val/2-size[ind]/2)+"px");
-			});
-			
-			valorHeightFuturo=Jesm.Cross.client(diag.elemento)[1];
-			Jesm.css(diag.elemento, "width:0;height:0;opacity:0");
+			this.currentDialog=isConfirm;
+			this.currentPromisse=this.promisseFactory();
 
-			var promisse=this.promisseFactory();
-			
-			diag.go(.5, [500, valorHeightFuturo, 1]);
-			diag.elemento.pega("button", 0).onclick=function(){
-				diag.go(.25, [, , 0], function(){
-					Jesm.css(this.elemento, "display:none");
-					promisse.resolve();
-				});
-			};
-
-			return promisse;
+			return this.currentPromisse;
 		},
-
+		_hideDialog:function(bool){
+			var THIS=this;
+			App.html.dialog.go(.25, [0], function(){
+				Jesm.css(this.elemento, 'display:none');
+				THIS.currentPromisse.resolve(bool);
+			});
+			App.html.dialogContainer.go(.4, [0, -30]);
+		},
+		_okEvent:function(){
+			this._hideDialog(this.currentDialog?true:null);
+		},
+		_cancelEvent:function(){
+			this._hideDialog(false);
+		},
+		alert:function(str){
+			return this._displayDialog(str);
+		},
 		confirm:function(str){
-			var diag=App.html.dialogs.confirm, valorHeightFuturo;
-			Jesm.css(diag.elemento, "display:block;width:500px;height:auto;opacity:.1").pega("p", 0).innerHTML=str;
-			
-			var sizeMain=Jesm.Cross.client(App.html.root), size=Jesm.Cross.client(diag.elemento);
-			Jesm.cada(sizeMain, function(val, ind){
-				Jesm.css(diag.elemento, (ind?"top":"left")+":"+(val/2-size[ind]/2)+"px");
-			});
-			
-			valorHeightFuturo=Jesm.Cross.client(diag.elemento)[1];
-			Jesm.css(diag.elemento, "width:0;height:0;opacity:0");
-
-			var promisse=this.promisseFactory();
-			
-			diag.go(.5, [500, valorHeightFuturo, 1]);
-			Jesm.cada(diag.elemento.pega("button"), function(el, ind){
-				var ok=!ind;
-				el.onclick=function(){
-					diag.go(.25, [, , 0], function(){
-						Jesm.css(this.elemento, "display:none");
-						promisse.resolve(ok);
-					});
-				};
-			});
-
-			return promisse;
+			return this._displayDialog(str, true);
 		},
 
 		init:function(){
-			App.html.dialogs={
-				alert:new Jesm.Anima(Jesm.pega("#alert"), "width;height;opacity"),
-				confirm:new Jesm.Anima(Jesm.pega("#confirm"), "width;height;opacity")
-			};
+			var frag=document.createDocumentFragment();
+
+			App.html.dialog=new Jesm.Anima(Jesm.el('div', 'id=dialog_box', frag), 'opacity');
+			App.html.dialogContainer=new Jesm.Anima(Jesm.el('div', 'class=container', App.html.dialog.elemento), 'opacity;left');
+			App.html.dialogText=Jesm.el('p', null, App.html.dialogContainer.elemento);
+			var buttons=Jesm.el('div', 'class=buttons', App.html.dialogContainer.elemento);
+
+			App.html.okButton=Jesm.el('button', 'class=ok', buttons, 'Ok');
+			Jesm.addEvento(App.html.okButton, 'click', this._okEvent, this);
+			App.html.cancelButton=Jesm.el('button', 'class=cancel', buttons, 'Cancel');
+			Jesm.addEvento(App.html.cancelButton, 'click', this._cancelEvent, this);
+
+
+
+			App.html.root.appendChild(frag);
 		}
 	},
 
