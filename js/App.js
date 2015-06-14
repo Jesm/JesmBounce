@@ -19,8 +19,40 @@ var App={
 		}
 	},
 
-	ui:{		
-		alert:function(str, depois){
+	ui:{
+		_then:function(callback){
+			this.callback=callback;
+			return this.returnPromisse=App.ui.promisseFactory();
+		},
+		_onOk:function(callback){
+			this.callbackOk=callback;
+			return this.returnPromisse=App.ui.promisseFactory();
+		},
+		_onCancel:function(callback){
+			this.callbackCancel=callback;
+			return this.returnPromisse=App.ui.promisseFactory();
+		},
+		_resolve:function(ok){
+			if(!this.returnPromisse)
+				return;
+			var str=ok==null?'':(ok?'Ok':'Cancel'), p=this['callback'+str]();
+			if(p&&p.then){
+				var THIS=this;
+				p.then(function(){
+					THIS.returnPromisse.resolve();
+				});
+			}
+		},
+		promisseFactory:function(){
+			return {
+				then:this._then,
+				onOk:this._onOk,
+				onCancel:this._onCancel,
+				resolve:this._resolve
+			};
+		},
+
+		alert:function(str){
 			var diag=App.html.dialogs.alert, valorHeightFuturo;
 			Jesm.css(diag.elemento, "display:block;width:500px;height:auto;opacity:.1").pega("p", 0).innerHTML=str;
 			
@@ -31,18 +63,21 @@ var App={
 			
 			valorHeightFuturo=Jesm.Cross.client(diag.elemento)[1];
 			Jesm.css(diag.elemento, "width:0;height:0;opacity:0");
+
+			var promisse=this.promisseFactory();
 			
 			diag.go(.5, [500, valorHeightFuturo, 1]);
 			diag.elemento.pega("button", 0).onclick=function(){
 				diag.go(.25, [, , 0], function(){
 					Jesm.css(this.elemento, "display:none");
-					if(depois)
-						depois();
+					promisse.resolve();
 				});
 			};
+
+			return promisse;
 		},
 
-		confirm:function(str, depois1, depois2){
+		confirm:function(str){
 			var diag=App.html.dialogs.confirm, valorHeightFuturo;
 			Jesm.css(diag.elemento, "display:block;width:500px;height:auto;opacity:.1").pega("p", 0).innerHTML=str;
 			
@@ -53,18 +88,21 @@ var App={
 			
 			valorHeightFuturo=Jesm.Cross.client(diag.elemento)[1];
 			Jesm.css(diag.elemento, "width:0;height:0;opacity:0");
+
+			var promisse=this.promisseFactory();
 			
 			diag.go(.5, [500, valorHeightFuturo, 1]);
 			Jesm.cada(diag.elemento.pega("button"), function(el, ind){
-				var func=ind?depois2:depois1;
+				var ok=!ind;
 				el.onclick=function(){
 					diag.go(.25, [, , 0], function(){
 						Jesm.css(this.elemento, "display:none");
-						if(func)
-							func();
+						promisse.resolve(ok);
 					});
 				};
-			})
+			});
+
+			return promisse;
 		},
 
 		init:function(){
@@ -273,7 +311,7 @@ var App={
 				localStorage.maiorPontuacao=this.pontuacao;
 			this.mostraInfo.tira();
 			setTimeout(function(){
-				App.ui.confirm("Você conseguiu o total de "+App.game.pontuacao+" pontos! Deseja jogar novamente?", function(){
+				App.ui.confirm("Final score: "+App.game.pontuacao+" points! Play again?").onOk(function(){
 					App.game.start();
 				});
 			}, 500);
@@ -344,17 +382,19 @@ var App={
 
 		this.html.root.appendChild(frag);
 
-		// App.ui.alert("Bem-vindo ao JesmBounce! Clique em 'Ok' para continuar", function(){
-		// 	App.ui.alert("Passe o mouse por cima das bolas roxas para fazer pontos!", function(){
-		// 		App.ui.alert("Desvie o mouse das bolas pequenas para não perder!", function(){
-		// 			App.ui.alert("Clique em 'Ok' para iniciar ->", function(){
-		// 				App.game.start();
-		// 			});
-		// 		});
-		// 	});
-		// });
-
-		App.game.start();
+		App.ui.alert('Welcome to JesmBounce! Click "Ok" to continue')
+		.then(function(){
+			return App.ui.alert('Move your mouse over the purple circles to score!');
+		})
+		.then(function(){
+			return App.ui.alert('Avoid the little dots!');
+		})
+		.then(function(){
+			return App.ui.alert('Click "Ok" to start');
+		})
+		.then(function(){
+			App.game.start();
+		});
 	}
 
 };
