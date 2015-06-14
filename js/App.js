@@ -307,6 +307,7 @@ var App={
 				App.ui.confirm("Final score: "+App.game.pontuacao+" points! Play again?").onOk(function(){
 					App.game.start();
 				});
+				App.html.root.classList.remove('playing');
 			}, 500);
 		},
 
@@ -327,6 +328,7 @@ var App={
 			Jesm.Core.animator.addTarefa(function(){
 				this.draw();
 			}, this);
+			App.html.root.classList.add('playing');
 		},
 
 		init:function(){
