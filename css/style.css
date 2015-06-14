@@ -7,7 +7,7 @@ html, body, main{
 	height:100%;
 }
 html, button{
-	font: 16px/1.5 'Oswald', Tahoma, Geneva, sans-serif;
+	font: 16px/1.5 'Oswald', sans-serif;
 	text-transform: uppercase;
 	color:#CCC;
 }
@@ -87,8 +87,7 @@ main{
 	width: auto;
 }
 .cursor, .mostra_cursor{
-	background:#F39;
-	border:1px solid #0F0;
+	background:#009B58;
 	border-radius:50px;
 	position:absolute;
 }
@@ -105,26 +104,25 @@ main.playing .cursor{
 	opacity: 1;
 }
 .mostra_cursor{
-	background:#0F0;
-	border:1px solid #F39;
+	background:#CF3B29;
 }
 .bounce{
 	z-index:1;
 	position:absolute;
 	border-radius:10px;
-	background-color:#0F6;
+	background-color:#FFB502;
 	transition:background-color .5s;
 	-moz-transition:background-color .5s;
 	-webkit-transition:background-color .5s;
 }
 body.invincible .bounce{
-	background-color:#0F6!important;
+	background-color: #166BEC !important;
 }
 .alvo{
 	z-index:0;
 	position:absolute;
-	background:#66F;
-	box-shadow:0 0 6px #0F0;
+	background:#FFB502;
+	box-shadow:0 0 6px #FFB502;
 	border-radius:40px;
 	width:0;
 	height:0;

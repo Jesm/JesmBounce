@@ -354,7 +354,7 @@ var App={
 		this.ui.init();
 		this.game.init();
 
-		var size=App.cfg.cursorDiameter-2, frag=document.createDocumentFragment();
+		var size=App.cfg.cursorDiameter, frag=document.createDocumentFragment();
 
 		this.html.cursor=Jesm.el('div', 'class=cursor', frag);
 		this.html.cursor.setAttribute("unselectable", "on");
