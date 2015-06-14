@@ -87,6 +87,21 @@ var App={
 			return this._displayDialog(str, true);
 		},
 
+		displayInfo:function(){
+			Jesm.css(App.html.gameInfo.elemento, 'opacity:0');
+			if(!localStorage.maiorPontuacao)
+				localStorage.maiorPontuacao=0;
+			this.updateScore();
+			App.html.record.innerHTML=localStorage.maiorPontuacao;
+			App.html.gameInfo.go(.4, [1]);
+		},
+		hideInfo:function(){
+			App.html.gameInfo.go(.4, [0]);
+		},
+		updateScore:function(){
+			App.html.score.innerHTML=App.game.pontuacao;
+		},
+
 		init:function(){
 			var frag=document.createDocumentFragment();
 
@@ -100,7 +115,12 @@ var App={
 			App.html.cancelButton=Jesm.el('button', 'class=cancel', buttons, 'Cancel');
 			Jesm.addEvento(App.html.cancelButton, 'click', this._cancelEvent, this);
 
-
+			App.html.gameInfo=new Jesm.Anima(Jesm.el('div', 'id=game_info', frag), 'opacity');
+			Jesm.el('span', 'class=label', App.html.gameInfo.elemento, 'Score:');
+			App.html.score=Jesm.el('span', null, App.html.gameInfo.elemento);
+			Jesm.el('span', 'class=label', App.html.gameInfo.elemento, '/');
+			Jesm.el('span', 'class=label', App.html.gameInfo.elemento, 'Record:');
+			App.html.record=Jesm.el('span', null, App.html.gameInfo.elemento);
 
 			App.html.root.appendChild(frag);
 		}
@@ -148,23 +168,6 @@ var App={
 					}, jogo);
 				}
 			}
-		},
-
-		mostraInfo:{
-			anima:new Jesm.Anima(pega("#info_jogo"), "opacity"),
-			go:function(){
-				Jesm.css(this.anima.elemento, "opacity:0");
-				this.placar.innerHTML=0;
-				if(!localStorage.maiorPontuacao)
-					localStorage.maiorPontuacao=0;
-				this.recorde.innerHTML=localStorage.maiorPontuacao;
-				this.anima.go(.5, [1]);
-			},
-			tira:function(){
-				this.anima.go(.5, [0]);
-			},
-			placar:pega("#placar"),
-			recorde:pega("#recorde")
 		},
 
 		addBounce:function(X, Y){
@@ -302,7 +305,7 @@ var App={
 			})();
 			if(parseInt(localStorage.maiorPontuacao)<this.pontuacao)
 				localStorage.maiorPontuacao=this.pontuacao;
-			this.mostraInfo.tira();
+			App.ui.hideInfo();
 			setTimeout(function(){
 				App.ui.confirm("Final score: "+App.game.pontuacao+" points! Play again?").onOk(function(){
 					App.game.start();
@@ -323,7 +326,7 @@ var App={
 			});
 			App.html.mostraCursor.stop();
 			this.addTarget();
-			this.mostraInfo.go();
+			App.ui.displayInfo();
 			Jesm.css(App.html.mostraCursor.elemento, "display:none");
 			Jesm.Core.animator.addTarefa(function(){
 				this.draw();
@@ -337,7 +340,8 @@ var App={
 		addPoints:function(b){
 			if(b==null)
 				b=1;
-			this.mostraInfo.placar.innerHTML=(this.pontuacao+=b);
+			this.pontuacao+=b;
+			App.ui.updateScore();
 		}
 
 	},

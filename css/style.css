@@ -7,7 +7,7 @@ html, body, main{
 	height:100%;
 }
 html, button{
-	font-family: 'Oswald', Tahoma, Geneva, sans-serif;
+	font: 16px/1.5 'Oswald', Tahoma, Geneva, sans-serif;
 	text-transform: uppercase;
 	color:#CCC;
 }
@@ -68,15 +68,23 @@ main{
 #dialog_box.show_cancel .cancel{
 	display: inline-block;
 }
-#info_jogo{
+#game_info{
+	position: absolute;
 	top:0;
 	left:0;
+	padding:18px;
 	opacity:0;
-	background:#000;
-	background:rgba(0, 0, 0, .7);
-	color:#FFF;
-	display:inline-block;
-	padding:10px;
+	font-size: 24px;
+	line-height: 24px;
+}
+#game_info span{
+	display: inline-block;
+	width: 27px;
+	text-align: center;
+}
+#game_info .label{
+	margin: 0 5px;
+	width: auto;
 }
 .cursor, .mostra_cursor{
 	background:#F39;
